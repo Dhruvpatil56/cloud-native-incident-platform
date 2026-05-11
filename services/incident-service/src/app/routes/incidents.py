@@ -25,7 +25,7 @@ from observability.prometheus import (
 )
 from signals.store import SignalStore
 from workflow.state_machine import InvalidTransitionError, transition_or_raise
-from shared.python.events.publisher import publish_event
+from app.shared.python.events.publisher import publish_event
 from observability.tracing.correlation import get_trace_id
 
 router = APIRouter(prefix="/api/v1/incidents", tags=["incidents"])
