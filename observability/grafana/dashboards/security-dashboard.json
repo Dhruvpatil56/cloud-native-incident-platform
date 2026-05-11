@@ -1,0 +1,171 @@
+{
+  "title": "Platform Security Dashboard",
+  "uid": "platform-security-dashboard",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Vulnerability counts",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(trivy_vulnerabilities_total)"
+        }
+      ],
+      "description": "TODO: wire exporter/collector metric if unavailable"
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Policy violations",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(kyverno_policy_violations_total)"
+        }
+      ],
+      "description": "TODO: depends on Kyverno metrics endpoint"
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Falco alerts",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(falco_events_total[5m]))"
+        }
+      ],
+      "description": "TODO: verify falco metric name"
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Image signing status",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(cosign_verification_success_total)"
+        }
+      ],
+      "description": "TODO: add signature verification exporter if unavailable"
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Admission denials",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(apiserver_admission_webhook_rejection_count[5m]))"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Suspicious container activity",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({job=\"fluent-bit\"} |= \"Shell spawned inside container\" [5m]))"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Runtime alerts",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({job=\"fluent-bit\"} |= \"Falco\" [5m]))"
+        }
+      ],
+      "description": "TODO: adjust selectors to your Falco log labels"
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  }
+}

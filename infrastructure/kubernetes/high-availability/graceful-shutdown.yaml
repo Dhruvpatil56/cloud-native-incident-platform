@@ -1,0 +1,8 @@
+terminationGracePeriodSeconds: 30
+
+lifecycle:
+  preStop:
+    exec:
+      command:
+        - sleep
+        - "10"

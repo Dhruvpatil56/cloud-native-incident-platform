@@ -1,0 +1,25 @@
+services:
+  - name: api-gateway
+    owner: platform-team
+    tier: critical
+    language: python
+
+  - name: auth-service
+    owner: platform-team
+    tier: critical
+    language: python
+
+  - name: order-service
+    owner: platform-team
+    tier: critical
+    language: python
+
+  - name: incident-service
+    owner: sre-team
+    tier: critical
+    language: python
+
+  - name: aiops-engine
+    owner: sre-team
+    tier: experimental
+    language: python

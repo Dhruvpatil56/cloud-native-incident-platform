@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: incident-service-config
+  namespace: platform
+data:
+  INCIDENT_DATABASE_URL: "postgresql://incident:incident@postgres:5432/incidents"
+  INCIDENT_MONGO_URL: "mongodb://mongo:27017"
+  INCIDENT_REDIS_URL: "redis://redis:6379/0"
+  INCIDENT_NATS_URL: "nats://nats:4222"
+  INCIDENT_NATS_SUBJECT: "signals.raw"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incident-service
+  namespace: platform
+  labels:
+    app: incident-service
+    version: "1.0.0"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: incident-service
+  template:
+    metadata:
+      labels:
+        app: incident-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: incident-service
+          image: ECR_REGISTRY/cloud-native-platform/incident-service:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: incident-service-config
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: incident-service
+  namespace: platform
+  labels:
+    app: incident-service
+spec:
+  selector:
+    app: incident-service
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

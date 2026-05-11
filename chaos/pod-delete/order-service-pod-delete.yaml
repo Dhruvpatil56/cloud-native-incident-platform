@@ -1,0 +1,28 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: order-service-pod-delete
+  namespace: litmus
+
+spec:
+  appinfo:
+    appns: platform
+    applabel: "app=order-service"
+    appkind: deployment
+
+  chaosServiceAccount: litmus-admin
+
+  experiments:
+    - name: pod-delete
+
+      spec:
+        components:
+          env:
+            - name: TOTAL_CHAOS_DURATION
+              value: "60"
+
+            - name: CHAOS_INTERVAL
+              value: "10"
+
+            - name: FORCE
+              value: "false"

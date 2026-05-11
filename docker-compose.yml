@@ -1,0 +1,312 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: platform-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-incident}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-incident}
+      POSTGRES_DB: ${POSTGRES_DB:-incidents}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./services/incident-service/src/incident_pipeline/db/migrate.sql:/docker-entrypoint-initdb.d/001_migrate.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U incident -d incidents"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mongo:
+    image: mongo:7
+    container_name: platform-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: platform-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: platform-nats
+    command: ["-m", "8222"]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+  incident-service:
+    build:
+      context: ./services/incident-service
+      dockerfile: Dockerfile
+    container_name: platform-incident-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+      nats:
+        condition: service_started
+    environment:
+      INCIDENT_DATABASE_URL: postgresql://incident:incident@postgres:5432/incidents
+      INCIDENT_MONGO_URL: mongodb://mongo:27017
+      INCIDENT_REDIS_URL: redis://redis:6379/0
+      INCIDENT_NATS_URL: nats://nats:4222
+      INCIDENT_NATS_SUBJECT: signals.raw
+    ports:
+      - "8000:8000"
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: platform-api-gateway
+    depends_on:
+      - incident-service
+      - health-service
+    environment:
+      INCIDENT_SERVICE_URL: http://incident-service:8000
+      HEALTH_SERVICE_URL: http://health-service:8001
+    ports:
+      - "8080:8080"
+
+  health-service:
+    build:
+      context: ./services/health-service
+      dockerfile: Dockerfile
+    container_name: platform-health-service
+    ports:
+      - "8001:8001"
+
+  incident-service-ui:
+    build:
+      context: ./services/incident-service-ui
+      dockerfile: Dockerfile
+    container_name: platform-frontend
+    depends_on:
+      - api-gateway
+    ports:
+      - "5173:5173"
+
+  order-service:
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile
+    container_name: platform-order-service
+    ports:
+      - "8002:8002"
+    depends_on:
+      - otel-collector
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: platform-auth-service
+    ports:
+      - "8003:8003"
+    depends_on:
+      - otel-collector
+    restart: unless-stopped
+
+  load-simulator:
+    build:
+      context: ./services/load-simulator
+      dockerfile: Dockerfile
+    container_name: platform-load-simulator
+    depends_on:
+      - order-service
+      - auth-service
+      - api-gateway
+    restart: always
+
+  aiops-engine:
+    build:
+      context: ./services/aiops-engine
+      dockerfile: Dockerfile
+    container_name: platform-aiops-engine
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    depends_on:
+      - nats
+      - incident-service
+    restart: unless-stopped
+
+  platform-api:
+    build:
+      context: ./platform-api
+      dockerfile: Dockerfile
+
+    container_name: platform-api
+
+    ports:
+      - "8081:8080"
+
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: platform-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/prometheus/rules:/etc/prometheus/rules:ro
+      - ./observability/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml
+      - ./observability/prometheus/recording-rules.yml:/etc/prometheus/recording-rules.yml
+      - ./observability/prometheus/slo-burn-alerts.yml:/etc/prometheus/slo-burn-alerts.yml
+      - ./observability/prometheus/autoscaling-alerts.yml:/etc/prometheus/autoscaling-alerts.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - incident-service
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: platform-grafana
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: platform-loki
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./observability/loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki-data:/loki
+    ports:
+      - "3100:3100"
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: platform-tempo
+
+    command:
+      - "-config.file=/etc/tempo.yaml"
+
+    volumes:
+      - ./observability/tempo/tempo.yaml:/etc/tempo.yaml
+
+    ports:
+      - "3200:3200"
+
+  fluent-bit:
+    image: fluent/fluent-bit:3.0
+    container_name: platform-fluent-bit
+    ports:
+      - "24224:24224"
+    volumes:
+      - ./observability/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: platform-alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+    volumes:
+      - ./observability/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports:
+      - "9093:9093"
+    depends_on:
+      - incident-service
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: platform-otel-collector
+    command:
+      - "--config=/etc/otel-collector-config.yaml"
+    volumes:
+      - ./observability/otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4318:4318"
+      - "4317:4317"
+    depends_on:
+      - tempo
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: platform-postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: postgresql://incident:incident@postgres:5432/incidents?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "9187:9187"
+
+  mongodb-exporter:
+    image: percona/mongodb_exporter:0.40
+    container_name: platform-mongodb-exporter
+    command:
+      - "--mongodb.uri=mongodb://mongo:27017"
+    ports:
+      - "9216:9216"
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.62.0
+    container_name: platform-redis-exporter
+    environment:
+      REDIS_ADDR: redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "9121:9121"
+
+  nats-exporter:
+    image: natsio/prometheus-nats-exporter:latest
+    container_name: platform-nats-exporter
+    command: ["-varz", "-routez", "-connz", "-subz", "http://nats:8222"]
+    ports:
+      - "7777:7777"
+    depends_on:
+      - nats
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: platform-node-exporter
+    command:
+      - "--path.rootfs=/host"
+    pid: host
+    volumes:
+      - "/:/host:ro,rslave"
+    ports:
+      - "9100:9100"
+
+volumes:
+  postgres-data:
+  mongo-data:
+  redis-data:
+  grafana-data:
+  loki-data:

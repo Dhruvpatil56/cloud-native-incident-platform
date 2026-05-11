@@ -1,0 +1,137 @@
+stages:
+  - fmt
+  - validate
+  - plan
+  - apply
+  - build
+  - scan
+  - sbom
+  - sign
+  - push
+  - gitops-update
+
+variables:
+  AWS_REGION: us-east-1
+  CLUSTER_NAME: cloud-native-platform
+  ECR_REGISTRY: "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+
+terraform-fmt:
+  stage: fmt
+  image: hashicorp/terraform:1.7.5
+  script:
+    - terraform -chdir=infrastructure/terraform fmt -check -recursive
+
+terraform-validate:
+  stage: validate
+  image: hashicorp/terraform:1.7.5
+  script:
+    - terraform -chdir=infrastructure/terraform init -backend=false
+    - terraform -chdir=infrastructure/terraform validate
+
+terraform-plan:
+  stage: plan
+  image: hashicorp/terraform:1.7.5
+  script:
+    - echo "Use existing env-specific Terraform plan commands here."
+
+terraform-apply:
+  stage: apply
+  image: hashicorp/terraform:1.7.5
+  script:
+    - echo "Use existing env-specific Terraform apply commands here."
+  when: manual
+
+build-images:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - apk add --no-cache bash python3 py3-pip
+    - pip install awscli
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+  script:
+    - chmod +x scripts/build-images.sh
+    - ./scripts/build-images.sh
+  only:
+    - develop
+    - main
+
+scan-images:
+  stage: scan
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - trivy image --exit-code 1 --severity CRITICAL,HIGH ${ECR_REGISTRY}/cloud-native-platform/order-service:${CI_COMMIT_SHA}
+    - trivy image --exit-code 1 --severity CRITICAL,HIGH ${ECR_REGISTRY}/cloud-native-platform/auth-service:${CI_COMMIT_SHA}
+  only:
+    - main
+
+generate-sbom:
+  stage: sbom
+
+  image:
+    name: anchore/syft:latest
+    entrypoint: [""]
+
+  script:
+    - chmod +x security/sbom/generate-sbom.sh
+    - ./security/sbom/generate-sbom.sh
+
+  artifacts:
+    paths:
+      - sbom-output/
+
+  only:
+    - main
+
+sign-images:
+  stage: sign
+
+  image:
+    name: gcr.io/projectsigstore/cosign:v2.2.4
+    entrypoint: [""]
+
+  script:
+    - chmod +x security/cosign/sign-images.sh
+    - ./security/cosign/sign-images.sh
+
+  only:
+    - main
+
+push-images:
+  stage: push
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - apk add --no-cache bash python3 py3-pip
+    - pip install awscli
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+  script:
+    - chmod +x scripts/push-images.sh
+    - ./scripts/push-images.sh
+  only:
+    - develop
+    - main
+
+gitops-update:
+  stage: gitops-update
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+
+  before_script:
+    - apt-get update && apt-get install -y git curl
+    - curl -s https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh | bash
+    - mv kustomize /usr/local/bin/
+
+  script:
+    - chmod +x scripts/update-image-tags.sh
+    - chmod +x scripts/gitops-commit.sh
+    - ./scripts/update-image-tags.sh
+    - ./scripts/gitops-commit.sh
+
+  only:
+    - main

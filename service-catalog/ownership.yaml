@@ -1,0 +1,13 @@
+ownership:
+  platform-team:
+    email: platform@example.com
+    services:
+      - api-gateway
+      - auth-service
+      - order-service
+
+  sre-team:
+    email: sre@example.com
+    services:
+      - incident-service
+      - aiops-engine

@@ -1,0 +1,61 @@
+groups:
+  - name: platform-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+
+        annotations:
+          summary: "High application error rate detected"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+
+        labels:
+          severity: warning
+
+        annotations:
+          summary: "High p95 latency detected"
+
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+
+        labels:
+          severity: critical
+
+        annotations:
+          summary: "Service unavailable"
+
+      - alert: IncidentSpike
+        expr: increase(incidents_created_total[10m]) > 5
+        for: 2m
+
+        labels:
+          severity: warning
+
+        annotations:
+          summary: "High incident creation rate"
+
+      - alert: AIAnalysisFailures
+        expr: rate(aiops_analysis_failures_total[5m]) > 0
+        for: 2m
+
+        labels:
+          severity: warning
+
+        annotations:
+          summary: "AI incident analysis failures detected"
+
+      - alert: HighIncidentVolume
+        expr: increase(incidents_created_total[10m]) > 10
+        for: 2m
+
+        labels:
+          severity: critical
+
+        annotations:
+          summary: "Unusually high incident volume"

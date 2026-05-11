@@ -1,0 +1,25 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: health-service-memory-hog
+  namespace: litmus
+
+spec:
+  appinfo:
+    appns: platform
+    applabel: "app=health-service"
+    appkind: deployment
+
+  chaosServiceAccount: litmus-admin
+
+  experiments:
+    - name: pod-memory-hog
+
+      spec:
+        components:
+          env:
+            - name: MEMORY_CONSUMPTION
+              value: "500"
+
+            - name: TOTAL_CHAOS_DURATION
+              value: "60"

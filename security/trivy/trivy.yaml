@@ -1,0 +1,11 @@
+severity:
+  - CRITICAL
+  - HIGH
+
+ignore-unfixed: true
+
+format: table
+
+vuln-type:
+  - os
+  - library

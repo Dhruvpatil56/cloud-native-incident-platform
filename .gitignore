@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+dist/
+.env
+
+# Node
+node_modules/
+dist/
+.next/
+
+# Docker
+.dockerignore
+
+# Infra
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local planning / working notes
+*plan*.md
+*fix*.md
+*report*.md
+*PLAN*.md
+*FIX*.md
+*REPORT*.md

@@ -1,0 +1,29 @@
+groups:
+  - name: autoscaling-alerts
+
+    rules:
+      - alert: HighCPUUsage
+
+        expr: |
+          avg(rate(container_cpu_usage_seconds_total[5m])) > 0.8
+
+        for: 5m
+
+        labels:
+          severity: warning
+
+        annotations:
+          summary: "High CPU usage detected"
+
+      - alert: HighMemoryUsage
+
+        expr: |
+          avg(container_memory_usage_bytes) > 500000000
+
+        for: 5m
+
+        labels:
+          severity: warning
+
+        annotations:
+          summary: "High memory usage detected"

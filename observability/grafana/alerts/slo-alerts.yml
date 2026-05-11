@@ -1,0 +1,22 @@
+apiVersion: 1
+
+groups:
+  - name: slo-alerts
+
+    rules:
+      - uid: availability-slo
+
+        title: Availability SLO Breach
+
+        condition: A
+
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: |
+                (
+                  sum(rate(http_requests_total{status!~"5.."}[5m]))
+                  /
+                  sum(rate(http_requests_total[5m]))
+                ) < 0.999

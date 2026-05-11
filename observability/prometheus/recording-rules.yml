@@ -1,0 +1,12 @@
+groups:
+  - name: platform-recording-rules
+
+    rules:
+      - record: platform:http_requests:rate5m
+        expr: sum(rate(http_requests_total[5m]))
+
+      - record: platform:error_rate:5m
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m]))
+
+      - record: platform:latency:p95
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
