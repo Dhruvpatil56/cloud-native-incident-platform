@@ -1,0 +1,23 @@
+CONTAINER ID   NAME                         CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS
+2c272c866c2d   platform-aiops-engine        0.18%     44.5MiB / 15.41GiB    0.28%     2.59kB / 1.27kB   0B / 319kB        3
+9ca20b36db5e   platform-incident-service    0.16%     60.38MiB / 15.41GiB   0.38%     204kB / 929kB     0B / 1.3MB        6
+a8773c91f3cd   platform-auth-service        0.16%     29.9MiB / 15.41GiB    0.19%     62.7kB / 43.3kB   0B / 807kB        1
+f56af1e453a5   platform-order-service       0.16%     29.96MiB / 15.41GiB   0.19%     67.3kB / 46.8kB   0B / 807kB        1
+115b6e33d163   platform-frontend            0.12%     54.93MiB / 15.41GiB   0.35%     20.1kB / 126B     2.67MB / 5.44MB   30
+f39e63643bfc   platform-load-simulator      0.00%     21.87MiB / 15.41GiB   0.14%     443kB / 533kB     6.41MB / 12.3kB   2
+4f53d949014f   platform-prometheus          0.09%     94.74MiB / 15.41GiB   0.60%     11.1MB / 1.37MB   62.4MB / 7.5MB    10
+1ed18c7e0159   platform-api-gateway         0.15%     47.02MiB / 15.41GiB   0.30%     1.15MB / 1.15MB   4.1kB / 1.09MB    2
+6fc05381c4b0   platform-alertmanager        0.09%     36.79MiB / 15.41GiB   0.23%     170kB / 49kB      23.3MB / 12.3kB   9
+93fdaceb8e81   platform-nats-exporter       0.03%     21.93MiB / 15.41GiB   0.14%     963kB / 1.18MB    10.9MB / 0B       10
+2bb15f039b2f   platform-postgres-exporter   0.00%     18.55MiB / 15.41GiB   0.12%     11.1MB / 5.19MB   10.7MB / 0B       7
+d2d96bdba58e   platform-fluent-bit          0.03%     18.86MiB / 15.41GiB   0.12%     22.6kB / 126B     17.1MB / 0B       3
+5fb0f6aaddfd   platform-otel-collector      0.08%     98.56MiB / 15.41GiB   0.62%     50.3kB / 22.8kB   88.3MB / 0B       8
+2ac7ecb29657   platform-redis-exporter      0.00%     16.34MiB / 15.41GiB   0.10%     4.22MB / 1.78MB   8.42MB / 0B       10
+0cb8bd1264e5   platform-postgres            0.00%     49.76MiB / 15.41GiB   0.32%     2.13MB / 10.9MB   29.7MB / 692kB    8
+8d3a67ef24d5   platform-redis               0.49%     13.2MiB / 15.41GiB    0.08%     332kB / 4.07MB    9.85MB / 0B       6
+74063c4f50f8   platform-nats                0.06%     19.41MiB / 15.41GiB   0.12%     272kB / 840kB     14.6MB / 0B       10
+81016a663a06   platform-mongo               0.47%     172MiB / 15.41GiB     1.09%     1.52MB / 22.9MB   101MB / 14.5MB    40
+890065afef5c   platform-api                 0.14%     31.99MiB / 15.41GiB   0.20%     23.8kB / 646B     434kB / 205kB     2
+5dc107b525c1   platform-health-service      0.14%     29.98MiB / 15.41GiB   0.19%     847kB / 654kB     0B / 164kB        1
+a0e9f00998a5   platform-node-exporter       0.00%     21.19MiB / 15.41GiB   0.13%     169kB / 2.91MB    13.2MB / 0B       7
+a76fdadfa193   platform-mongodb-exporter    0.02%     24.13MiB / 15.41GiB   0.15%     22.8MB / 1.83MB   13.7MB / 0B       7

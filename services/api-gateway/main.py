@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import os
@@ -24,6 +24,24 @@ async def gateway_health():
 
 
 @app.api_route("/api/incidents/{path:path}", methods=["GET", "POST", "PATCH", "DELETE"])
+
+@app.api_route("/api/v1/incidents", methods=["GET", "POST"])
+async def proxy_incidents_root(request: Request):
+    async with httpx.AsyncClient() as client:
+        response = await client.request(
+            method=request.method,
+            url=f"{INCIDENT_SERVICE_URL}/api/v1/incidents",
+            headers=dict(request.headers),
+            content=await request.body(),
+        )
+
+    return Response(
+        content=response.content,
+        status_code=response.status_code,
+        headers=dict(response.headers),
+    )
+
+@app.api_route("/api/v1/incidents/{path:path}", methods=["GET", "POST", "PATCH", "DELETE"])
 async def proxy_incidents(path: str, request: Request):
     url = f"{INCIDENT_SERVICE_URL}/{path}"
     async with httpx.AsyncClient() as client:

@@ -1,0 +1,100 @@
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://order-service:8002/orders -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+ERROR:__main__:[SIMULATOR] http://auth-service:8003/health -> ERROR: All connection attempts failed
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200
+INFO:httpx:HTTP Request: GET http://api-gateway:8080/api/health/services "HTTP/1.1 200 OK"
+INFO:__main__:[SIMULATOR] http://api-gateway:8080/api/health/services -> 200

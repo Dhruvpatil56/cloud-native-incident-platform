@@ -1,0 +1,22 @@
+ts=2026-05-11T14:29:08.521Z caller=main.go:601 level=info msg="No time or size retention was set so using the default time retention" duration=15d
+ts=2026-05-11T14:29:08.522Z caller=main.go:645 level=info msg="Starting Prometheus Server" mode=server version="(version=2.54.1, branch=HEAD, revision=e6cfa720fbe6280153fab13090a483dbd40bece3)"
+ts=2026-05-11T14:29:08.522Z caller=main.go:650 level=info build_context="(go=go1.22.6, platform=linux/amd64, user=root@812ffd741951, date=20240827-10:56:41, tags=netgo,builtinassets,stringlabels)"
+ts=2026-05-11T14:29:08.523Z caller=main.go:651 level=info host_details="(Linux 7.0.0-1004-aws #4-Ubuntu SMP PREEMPT Mon Apr 13 13:14:24 UTC 2026 x86_64 4f53d949014f (none))"
+ts=2026-05-11T14:29:08.524Z caller=main.go:652 level=info fd_limits="(soft=524288, hard=524288)"
+ts=2026-05-11T14:29:08.524Z caller=main.go:653 level=info vm_limits="(soft=unlimited, hard=unlimited)"
+ts=2026-05-11T14:29:08.544Z caller=web.go:571 level=info component=web msg="Start listening for connections" address=0.0.0.0:9090
+ts=2026-05-11T14:29:08.549Z caller=main.go:1160 level=info msg="Starting TSDB ..."
+ts=2026-05-11T14:29:08.564Z caller=tls_config.go:313 level=info component=web msg="Listening on" address=[::]:9090
+ts=2026-05-11T14:29:08.565Z caller=tls_config.go:316 level=info component=web msg="TLS is disabled." http2=false address=[::]:9090
+ts=2026-05-11T14:29:08.599Z caller=head.go:626 level=info component=tsdb msg="Replaying on-disk memory mappable chunks if any"
+ts=2026-05-11T14:29:08.599Z caller=head.go:713 level=info component=tsdb msg="On-disk memory mappable chunks replay completed" duration=6.355µs
+ts=2026-05-11T14:29:08.599Z caller=head.go:721 level=info component=tsdb msg="Replaying WAL, this may take a while"
+ts=2026-05-11T14:29:08.603Z caller=head.go:793 level=info component=tsdb msg="WAL segment loaded" segment=0 maxSegment=0
+ts=2026-05-11T14:29:08.603Z caller=head.go:830 level=info component=tsdb msg="WAL replay completed" checkpoint_replay_duration=50.362µs wal_replay_duration=3.568639ms wbl_replay_duration=172ns chunk_snapshot_load_duration=0s mmap_chunk_replay_duration=6.355µs total_replay_duration=3.659766ms
+ts=2026-05-11T14:29:08.611Z caller=main.go:1181 level=info fs_type=EXT4_SUPER_MAGIC
+ts=2026-05-11T14:29:08.611Z caller=main.go:1184 level=info msg="TSDB started"
+ts=2026-05-11T14:29:08.611Z caller=main.go:1367 level=info msg="Loading configuration file" filename=/etc/prometheus/prometheus.yml
+ts=2026-05-11T14:29:08.646Z caller=main.go:1404 level=info msg="updated GOGC" old=100 new=75
+ts=2026-05-11T14:29:08.646Z caller=main.go:1415 level=info msg="Completed loading of configuration file" filename=/etc/prometheus/prometheus.yml totalDuration=35.307769ms db_storage=1.779µs remote_storage=2.403µs web_handler=965ns query_engine=7.301µs scrape=7.141347ms scrape_sd=593.366µs notify=41.603µs notify_sd=12.887µs rules=23.996702ms tracing=12.325µs
+ts=2026-05-11T14:29:08.646Z caller=main.go:1145 level=info msg="Server is ready to receive web requests."
+ts=2026-05-11T14:29:08.647Z caller=manager.go:164 level=info component="rule manager" msg="Starting rule manager..."

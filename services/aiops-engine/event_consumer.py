@@ -4,7 +4,6 @@ import nats
 
 from analyzer import analyze_incident
 from metrics import AIOPS_INCIDENTS_ANALYZED_TOTAL, AIOPS_ANALYSIS_FAILURES_TOTAL
-from observability.tracing.correlation import get_trace_id
 
 
 async def start_consumer():
@@ -19,7 +18,6 @@ async def start_consumer():
             analysis = await analyze_incident(data)
             AIOPS_INCIDENTS_ANALYZED_TOTAL.inc()
 
-            print(f"\n===== AI INCIDENT ANALYSIS (trace_id={get_trace_id()}) =====\n")
             print(analysis)
             print("\n===============================\n")
         except Exception as e:

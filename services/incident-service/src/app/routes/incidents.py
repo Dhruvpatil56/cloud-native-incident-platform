@@ -25,8 +25,6 @@ from observability.prometheus import (
 )
 from signals.store import SignalStore
 from workflow.state_machine import InvalidTransitionError, transition_or_raise
-from app.shared.python.events.publisher import publish_event
-from observability.tracing.correlation import get_trace_id
 
 router = APIRouter(prefix="/api/v1/incidents", tags=["incidents"])
 
@@ -48,32 +46,11 @@ class RcaPayload(BaseModel):
 @router.post("")
 async def create_incident(
     incident: Incident,
-    request: Request,
-    pipeline: IncidentPipeline = Depends(get_pipeline)
-) -> dict:
-    trace_id = get_trace_id()
-    if trace_id and trace_id != "00000000000000000000000000000000":
-        incident.metadata["trace_id"] = trace_id
+    pipeline: IncidentPipeline = Depends(get_pipeline)) -> dict:
     incident.severity = COMPONENT_SEVERITY_MAP.get(incident.component, incident.severity)
     result = pipeline.process(incident)
     if result.status != 201 or result.incident is None:
         raise HTTPException(status_code=result.status, detail=result.reason or result.errors)
-    try:
-        await publish_event(
-            request.app.state.nats,
-            "incidents.created",
-            {
-                "event_type": "incident.created",
-                "incident_id": str(result.incident.id),
-                "service": result.incident.component,
-                "severity": result.incident.severity.value,
-                "message": result.incident.title,
-                "trace_id": trace_id,
-            },
-        )
-    except Exception:
-        # AI/eventing is best-effort and must never block incident creation.
-        pass
     return result.incident.model_dump(mode="json")
 
 

@@ -1,13 +1,11 @@
 import asyncio
 
 from fastapi import FastAPI
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from event_consumer import start_consumer
 from metrics import start_metrics_server
 
 app = FastAPI(title="AIOps Engine", version="1.0.0")
-FastAPIInstrumentor.instrument_app(app)
 
 
 @app.on_event("startup")

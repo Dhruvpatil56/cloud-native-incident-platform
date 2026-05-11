@@ -1,0 +1,4 @@
+platform-aiops-engine  | INFO:     Started server process [1]
+platform-aiops-engine  | INFO:     Waiting for application startup.
+platform-aiops-engine  | INFO:     Application startup complete.
+platform-aiops-engine  | INFO:     Uvicorn running on http://0.0.0.0:8005 (Press CTRL+C to quit)
