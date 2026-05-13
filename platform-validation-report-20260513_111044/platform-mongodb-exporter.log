@@ -1,0 +1,2 @@
+level=info ts=2026-05-13T10:51:56.195Z caller=tls_config.go:274 msg="Listening on" address=[::]:9216
+level=info ts=2026-05-13T10:51:56.195Z caller=tls_config.go:277 msg="TLS is disabled." http2=false address=[::]:9216

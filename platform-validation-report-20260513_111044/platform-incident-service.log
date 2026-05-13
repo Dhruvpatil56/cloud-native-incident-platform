@@ -1,0 +1,39 @@
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     172.18.0.21:46150 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:41122 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:37828 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:53662 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:38884 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:41626 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:51080 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:48168 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:32916 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:58944 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:56802 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:49064 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:38818 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.21:60974 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     172.18.0.1:55914 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56272 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56280 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56290 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56304 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56306 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56316 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56320 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56324 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56332 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56334 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56340 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56346 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56358 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56366 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56372 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56374 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56386 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56390 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56400 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56402 - "GET /health HTTP/1.1" 200 OK

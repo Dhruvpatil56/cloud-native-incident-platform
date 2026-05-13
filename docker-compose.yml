@@ -244,7 +244,7 @@ services:
       - incident-service
 
   otel-collector:
-    image: otel/opentelemetry-collector:latest
+    image: otel/opentelemetry-collector-contrib:latest
     container_name: platform-otel-collector
     command:
       - "--config=/etc/otel-collector-config.yaml"
@@ -253,6 +253,7 @@ services:
     ports:
       - "4317:4317"
       - "4318:4318"
+      - "8889:8889"
 
     depends_on:
       - tempo

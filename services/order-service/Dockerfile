@@ -1,16 +1,9 @@
 FROM python:3.12-slim
-
 WORKDIR /app
-
-# Install only the core requirements
-RUN pip install --no-cache-dir fastapi uvicorn setuptools==70.0.0
-
-# Copy service code
+COPY requirements.txt .
+RUN pip install --no-cache-dir setuptools==70.0.0 && \
+    pip install --no-cache-dir -r requirements.txt
 COPY . .
-
-# Ensure Python looks at the root for modules
 ENV PYTHONPATH=/app
-
-EXPOSE 8003
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003"]
+EXPOSE 8002
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]

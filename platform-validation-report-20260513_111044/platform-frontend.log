@@ -1,0 +1,9 @@
+
+> incident-dashboard@0.1.0 dev
+> vite --host 0.0.0.0 --port 5173
+
+
+  VITE v7.3.2  ready in 690 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://172.18.0.23:5173/

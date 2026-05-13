@@ -53,3 +53,13 @@ async def services_health():
             "last_checked": datetime.datetime.utcnow().isoformat(),
         })
     return {"services": services, "total": len(services)}
+
+from prometheus_client import make_asgi_app
+from starlette.routing import Mount
+
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
+
+from prometheus_client import make_asgi_app
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)

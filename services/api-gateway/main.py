@@ -66,3 +66,13 @@ async def proxy_health(path: str, request: Request):
             params=request.query_params,
         )
     return response.json()
+
+from prometheus_client import make_asgi_app
+from starlette.routing import Mount
+
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
+
+from prometheus_client import make_asgi_app
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)

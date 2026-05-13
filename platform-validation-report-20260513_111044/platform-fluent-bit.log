@@ -1,0 +1,21 @@
+Fluent Bit v3.0.7
+* Copyright (C) 2015-2024 The Fluent Bit Authors
+* Fluent Bit is a CNCF sub-project under the umbrella of Fluentd
+* https://fluentbit.io
+
+___________.__                        __    __________.__  __          ________  
+\_   _____/|  |  __ __   ____   _____/  |_  \______   \__|/  |_  ___  _\_____  \ 
+ |    __)  |  | |  |  \_/ __ \ /    \   __\  |    |  _/  \   __\ \  \/ / _(__  < 
+ |     \   |  |_|  |  /\  ___/|   |  \  |    |    |   \  ||  |    \   / /       \
+ \___  /   |____/____/  \___  >___|  /__|    |______  /__||__|     \_/ /______  /
+     \/                     \/     \/               \/                        \/ 
+
+[2026/05/13 10:51:57] [ info] [fluent bit] version=3.0.7, commit=73e72bdf9a, pid=1
+[2026/05/13 10:51:57] [ info] [storage] ver=1.5.2, type=memory, sync=normal, checksum=off, max_chunks_up=128
+[2026/05/13 10:51:57] [ info] [cmetrics] version=0.9.1
+[2026/05/13 10:51:57] [ info] [ctraces ] version=0.5.1
+[2026/05/13 10:51:57] [ info] [input:tail:tail.0] initializing
+[2026/05/13 10:51:57] [ info] [input:tail:tail.0] storage_strategy='memory' (memory only)
+[2026/05/13 10:51:57] [error] [input:tail:tail.0] parser 'docker' is not registered
+[2026/05/13 10:51:57] [ info] [output:loki:loki.0] configured, hostname=loki:3100
+[2026/05/13 10:51:57] [ info] [sp] stream processor started
