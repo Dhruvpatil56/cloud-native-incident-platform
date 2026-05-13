@@ -1,36 +1,52 @@
 # Cloud Native Incident & Observability Platform
 
-A production-style DevOps/SRE platform that monitors, detects, and responds to incidents
-in cloud-native environments.
+A production-style DevOps/SRE platform designed for automated incident detection, response, and AI-driven analysis.
 
 ## Architecture
 
-- **Incident Service** - Core IMS with state machine, RCA, MTTR (FastAPI + PostgreSQL + Redis + NATS + MongoDB)
-- **API Gateway** - Central routing layer (FastAPI)
-- **Health Service** - Cluster and service health (FastAPI)
-- **Observability** - Prometheus + Grafana + Loki + Alertmanager + OpenTelemetry
-- **Frontend** - React operational dashboard
+- **Incident Service**: Core IMS (FastAPI, PostgreSQL, Redis, NATS, MongoDB).
+- **AIOps Engine**: AI-driven root cause analysis powered by **Groq LLM**.
+- **Observability**: Full-stack monitoring via Prometheus, Grafana, Alertmanager, and OpenTelemetry.
+- **API Gateway**: Central routing and security layer.
 
-## Quick Start
+## Quick Start (Cloud/EC2 Setup)
 
+For a fresh deployment on AWS/EC2, use the provided automation scripts to handle secrets and networking:
+
+### 1. Initialize Environment & Secrets
+This script creates your `.env` from the template and securely prompts for your AI keys.
 ```bash
-cp .env.example .env
-docker compose up --build
+chmod +x init-env.sh
+./init-env.sh
 ```
 
-## Service URLs (local)
+### 2. Update Public Connectivity
+Map the frontend to your current EC2 Public IP:
+```bash
+chmod +x update_ip.sh
+./update_ip.sh
+```
 
-| Service          | URL                   |
-| ---------------- | --------------------- |
-| API Gateway      | http://localhost:8080 |
-| Incident Service | http://localhost:8000 |
-| Health Service   | http://localhost:8001 |
-| Frontend         | http://localhost:5173 |
-| Grafana          | http://localhost:3000 |
-| Prometheus       | http://localhost:9090 |
-| Alertmanager     | http://localhost:9093 |
-| Loki             | http://localhost:3100 |
+### 3. Launch the Stack
+```bash
+docker compose up --build -d
+```
+
+## Service Access (AWS Deployment)
+
+| Service           | Port   | External URL Example             |
+| ----------------- | ------ | -------------------------------- |
+| **Frontend UI** | 5173   | http://<EC2_PUBLIC_IP>:5173      |
+| **API Gateway** | 8080   | http://<EC2_PUBLIC_IP>:8080      |
+| **Grafana** | 3000   | http://<EC2_PUBLIC_IP>:3000      |
+| **Prometheus** | 9090   | http://<EC2_PUBLIC_IP>:9090      |
+
+---
+
+## SRE Features
+- **Blameless Postmortems**: Automated via the AIOps engine.
+- **Reliability Metrics**: Real-time tracking of MTTR, MTTD, and MTTA.
+- **Self-Healing**: Automated incident triage via NATS event bus.
 
 ## Related Projects
-
-- [Incident Management System](https://github.com/Dhruvpatil56/incident-management-system) - The core IMS engine this platform is built around
+- [Incident Management System](https://github.com/Dhruvpatil56/incident-management-system) - The core IMS engine.
