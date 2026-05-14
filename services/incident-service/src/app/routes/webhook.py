@@ -5,7 +5,12 @@ import logging
 import json
 
 from app.dependencies import get_pipeline
-from incident_pipeline.models import Incident, IncidentState
+from incident_pipeline.models import (
+    Incident,
+    IncidentState,
+    Severity,
+    RcaCategory,
+)
 from incident_pipeline.pipeline import IncidentPipeline
 
 router = APIRouter(prefix="/webhook", tags=["webhook"])
@@ -33,13 +38,13 @@ class AlertmanagerPayload(BaseModel):
     alerts: List[Alert]
 
 
-def map_severity(severity: str) -> str:
+def map_severity(severity: str) -> Severity:
     mapping = {
-        "critical": "P0",
-        "warning": "P2",
-        "info": "P3",
+        "critical": Severity.p0,
+        "warning": Severity.p2,
+        "info": Severity.p3,
     }
-    return mapping.get(severity.lower(), "P2")
+    return mapping.get(severity.lower(), Severity.p2)
 
 
 @router.post("/alertmanager")
@@ -48,11 +53,13 @@ async def alertmanager_webhook(
     payload: AlertmanagerPayload,
     pipeline: IncidentPipeline = Depends(get_pipeline)
 ):
+
     logger.info(f"[WEBHOOK] Payload received: {payload.dict()}")
 
-    created = []
+    processed = []
 
     for alert in payload.alerts:
+
         if alert.status != "firing":
             continue
 
@@ -63,11 +70,12 @@ async def alertmanager_webhook(
         )
 
         severity = map_severity(alert.labels.severity or "warning")
+
         service = alert.labels.service or "unknown"
 
         logger.info(
-            f"[WEBHOOK] Creating incident: "
-            f"title={title} severity={severity} service={service}"
+            f"[WEBHOOK] Processing alert: "
+            f"title={title} severity={severity.value} service={service}"
         )
 
         incident = Incident(
@@ -77,41 +85,62 @@ async def alertmanager_webhook(
             component=service,
             source="alertmanager",
             root_cause="Pending investigation",
-            rca_category="unknown",
+            rca_category=RcaCategory.unknown,
             rca_description="Auto-generated from Alertmanager webhook",
             state=IncidentState.open,
         )
 
-        result = pipeline.process(incident)
+        try:
 
-        if result.incident:
+            result = pipeline.process(incident)
 
-            incident_payload = result.incident.model_dump(mode="json")
+            if result.incident:
 
-            await request.app.state.nats.publish(
-                "incidents.created",
-                json.dumps(incident_payload).encode()
+                incident_payload = result.incident.model_dump(mode="json")
+
+                await request.app.state.nats.publish(
+                    "incidents.created",
+                    json.dumps(incident_payload).encode()
+                )
+
+                logger.info(
+                    f"[WEBHOOK] Published incident event to NATS: "
+                    f"{result.incident.id}"
+                )
+
+                processed.append({
+                    "title": title,
+                    "action": "created",
+                    "incident_id": str(result.incident.id),
+                })
+
+            else:
+
+                logger.warning(
+                    f"[WEBHOOK] Incident creation failed: "
+                    f"{result.reason or result.errors}"
+                )
+
+                processed.append({
+                    "title": title,
+                    "action": result.reason or "failed",
+                })
+
+        except Exception as e:
+
+            logger.exception(
+                f"[WEBHOOK] Pipeline failure while processing "
+                f"'{title}': {e}"
             )
 
-            logger.info(
-                f"[WEBHOOK] Published incident event to NATS: "
-                f"{result.incident.id}"
-            )
-
-            created.append(incident_payload)
-
-            logger.info(
-                f"[WEBHOOK] Incident created successfully: "
-                f"{result.incident.id}"
-            )
-        else:
-            logger.error(
-                f"[WEBHOOK] Incident creation failed: "
-                f"{result.reason or result.errors}"
-            )
+            processed.append({
+                "title": title,
+                "action": "exception",
+                "error": str(e),
+            })
 
     return {
         "status": "received",
-        "incidents_created": len(created),
-        "details": created,
+        "processed": len(processed),
+        "details": processed,
     }
