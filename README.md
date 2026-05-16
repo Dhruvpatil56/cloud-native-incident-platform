@@ -11,42 +11,55 @@ A production-style DevOps/SRE platform designed for automated incident detection
 
 ## Quick Start (Cloud/EC2 Setup)
 
-For a fresh deployment on AWS/EC2, use the provided automation scripts to handle secrets and networking:
+When deploying on a fresh AWS/EC2 instance, follow these steps in order to set up your environment, configuration, and networking:
 
-### 1. Initialize Environment & Secrets
-This script creates your `.env` from the template and securely prompts for your AI keys.
-```bash
+### 1. Create the Environment File
+
+Always initialize your local configuration file from the template first:
+\`\`\`bash
+cp .env.example .env
+\`\`\`
+
+### 2. Initialize Secrets & AI Config
+
+Run the initialization script to securely paste your Groq API key without exposing it to Git:
+\`\`\`bash
 chmod +x init-env.sh
 ./init-env.sh
-```
+\`\`\`
 
-### 2. Update Public Connectivity
-Map the frontend to your current EC2 Public IP:
-```bash
+### 3. Update Public Connectivity
+
+Map the frontend API URL to your current EC2 instance's Public IP:
+\`\`\`bash
 chmod +x update_ip.sh
 ./update_ip.sh
-```
+\`\`\`
 
-### 3. Launch the Stack
-```bash
+### 4. Launch the Stack
+
+Build and launch all services cleanly in detached mode:
+\`\`\`bash
 docker compose up --build -d
-```
+\`\`\`
 
 ## Service Access (AWS Deployment)
 
-| Service           | Port   | External URL Example             |
-| ----------------- | ------ | -------------------------------- |
-| **Frontend UI** | 5173   | http://<EC2_PUBLIC_IP>:5173      |
-| **API Gateway** | 8080   | http://<EC2_PUBLIC_IP>:8080      |
-| **Grafana** | 3000   | http://<EC2_PUBLIC_IP>:3000      |
-| **Prometheus** | 9090   | http://<EC2_PUBLIC_IP>:9090      |
+| Service         | Port | External URL Example        |
+| --------------- | ---- | --------------------------- |
+| **Frontend UI** | 5173 | http://<EC2_PUBLIC_IP>:5173 |
+| **API Gateway** | 8080 | http://<EC2_PUBLIC_IP>:8080 |
+| **Grafana**     | 3000 | http://<EC2_PUBLIC_IP>:3000 |
+| **Prometheus**  | 9090 | http://<EC2_PUBLIC_IP>:9090 |
 
 ---
 
 ## SRE Features
+
 - **Blameless Postmortems**: Automated via the AIOps engine.
 - **Reliability Metrics**: Real-time tracking of MTTR, MTTD, and MTTA.
 - **Self-Healing**: Automated incident triage via NATS event bus.
 
 ## Related Projects
+
 - [Incident Management System](https://github.com/Dhruvpatil56/incident-management-system) - The core IMS engine.

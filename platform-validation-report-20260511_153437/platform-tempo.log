@@ -1,8 +1,0 @@
-failed parsing config: failed to parse configFile /etc/tempo.yaml: yaml: unmarshal errors:
-  line 4: field receivers not found in type app.Config
-failed parsing config: failed to parse configFile /etc/tempo.yaml: yaml: unmarshal errors:
-  line 4: field receivers not found in type app.Config
-failed parsing config: failed to parse configFile /etc/tempo.yaml: yaml: unmarshal errors:
-  line 4: field receivers not found in type app.Config
-failed parsing config: failed to parse configFile /etc/tempo.yaml: yaml: unmarshal errors:
-  line 4: field receivers not found in type app.Config

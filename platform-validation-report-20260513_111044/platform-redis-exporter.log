@@ -1,2 +1,0 @@
-time="2026-05-13T10:52:02Z" level=info msg="Redis Metrics Exporter v1.62.0    build date:     sha1: 620cb9964b0d7d7033fe5f9858e0952b7269de4d    Go: go1.22.5    GOOS: linux    GOARCH: amd64"
-time="2026-05-13T10:52:02Z" level=info msg="Providing metrics at :9121/metrics"
