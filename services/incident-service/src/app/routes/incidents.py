@@ -163,3 +163,22 @@ async def incident_throughput(
             lookback_hours=lookback_hours,
         ),
     }
+
+
+class AIAnalysisPayload(BaseModel):
+    analysis: str
+
+
+@router.patch("/{incident_id}/ai-analysis")
+async def store_ai_analysis(
+    incident_id: UUID,
+    payload: AIAnalysisPayload,
+    incident_store: IncidentStore = Depends(get_incident_store),
+) -> dict:
+    try:
+        success = incident_store.update_ai_analysis(incident_id, payload.analysis)
+        if not success:
+            raise HTTPException(status_code=404, detail="incident not found")
+        return {"status": "stored", "incident_id": str(incident_id)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

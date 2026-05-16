@@ -33,4 +33,6 @@ export interface Incident {
   component: string;
   mttr_seconds?: number | null;
   created_at: string;
+  updated_at: string;
+  ai_analysis?: string | null;
 }

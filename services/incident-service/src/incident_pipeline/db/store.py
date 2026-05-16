@@ -11,7 +11,6 @@ from observability.prometheus import db_timing
 
 
 def compute_hash(incident: Incident) -> str:
-    """Deterministic hash for dedup key. Matches debounce normalization."""
     normalized = {
         "source": incident.source.strip().lower(),
         "title": incident.title.strip().lower(),
@@ -22,8 +21,6 @@ def compute_hash(incident: Incident) -> str:
 
 
 class IncidentStore:
-    """Production store that reads/writes incidents in PostgreSQL."""
-
     def __init__(self, db_conn):
         self.db = db_conn
 
@@ -46,8 +43,9 @@ class IncidentStore:
             mttr_seconds=row[13],
             hash=row[14],
             metadata=row[15] or {},
-            created_at=row[16],
-            updated_at=row[17],
+            ai_analysis=row[16],
+            created_at=row[17],
+            updated_at=row[18],
         )
 
     def create(self, incident: Incident) -> Incident:
@@ -66,9 +64,10 @@ class IncidentStore:
                        (%s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s)
+                       ON CONFLICT (hash) DO NOTHING
                        RETURNING id, title, description, source, root_cause, rca_category,
                                  rca_description, rca_verified_by, state, severity, component,
-                                 first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata,
+                                 first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata, ai_analysis,
                                  created_at, updated_at""",
                     (
                         str(incident.id),
@@ -91,6 +90,8 @@ class IncidentStore:
                 )
                     row = cursor.fetchone()
                     self.db.commit()
+                    if row is None:
+                        raise ValueError(f"duplicate hash: {incident_hash}")
                     return self._from_row(row)
                 except Exception:
                     self.db.rollback()
@@ -107,7 +108,7 @@ class IncidentStore:
                 cursor.execute(
                 """SELECT id, title, description, source, root_cause, rca_category,
                           rca_description, rca_verified_by, state, severity, component,
-                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata,
+                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata, ai_analysis,
                           created_at, updated_at
                    FROM incidents
                    ORDER BY created_at DESC"""
@@ -123,7 +124,7 @@ class IncidentStore:
                 cursor.execute(
                 """SELECT id, title, description, source, root_cause, rca_category,
                           rca_description, rca_verified_by, state, severity, component,
-                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata,
+                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata, ai_analysis,
                           created_at, updated_at
                    FROM incidents WHERE id = %s""",
                 (str(incident_id),),
@@ -140,7 +141,7 @@ class IncidentStore:
                 cursor.execute(
                 """SELECT id, title, description, source, root_cause, rca_category,
                           rca_description, rca_verified_by, state, severity, component,
-                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata,
+                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata, ai_analysis,
                           created_at, updated_at
                    FROM incidents WHERE id = %s FOR UPDATE""",
                 (str(incident_id),),
@@ -156,7 +157,7 @@ class IncidentStore:
                 cursor.execute(
                 """SELECT id, title, description, source, root_cause, rca_category,
                           rca_description, rca_verified_by, state, severity, component,
-                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata,
+                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata, ai_analysis,
                           created_at, updated_at
                    FROM incidents WHERE id=%s""",
                 (str(incident_id),),
@@ -214,7 +215,7 @@ class IncidentStore:
                 cursor.execute(
                 """SELECT id, title, description, source, root_cause, rca_category,
                           rca_description, rca_verified_by, state, severity, component,
-                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata,
+                          first_signal_at, rca_submitted_at, mttr_seconds, hash, metadata, ai_analysis,
                           created_at, updated_at
                    FROM incidents WHERE id=%s""",
                 (str(incident_id),),
@@ -255,9 +256,23 @@ class IncidentStore:
                 cursor.close()
 
 
-class InMemoryStore:
-    """In-memory store for development / testing."""
 
+    def update_ai_analysis(self, incident_id, analysis: str) -> bool:
+        cursor = self.db.cursor()
+        try:
+            cursor.execute(
+                "UPDATE incidents SET ai_analysis=%s, updated_at=NOW() WHERE id=%s",
+                (analysis, str(incident_id)),
+            )
+            self.db.commit()
+            return cursor.rowcount > 0
+        except Exception:
+            self.db.rollback()
+            raise
+        finally:
+            cursor.close()
+
+class InMemoryStore:
     def __init__(self):
         self._records: dict[str, Incident] = {}
 
@@ -266,3 +281,5 @@ class InMemoryStore:
         record.hash = compute_hash(incident)
         self._records[str(record.id)] = record
         return record
+
+

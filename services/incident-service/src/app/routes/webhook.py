@@ -1,17 +1,12 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request, Depends
 from pydantic import BaseModel
 from typing import List, Optional
 import logging
 import json
 
-from app.dependencies import get_pipeline
-from incident_pipeline.models import (
-    Incident,
-    IncidentState,
-    Severity,
-    RcaCategory,
-)
+from incident_pipeline.models import Incident, RcaCategory, Severity
 from incident_pipeline.pipeline import IncidentPipeline
+from app.dependencies import get_pipeline
 
 router = APIRouter(prefix="/webhook", tags=["webhook"])
 logger = logging.getLogger(__name__)
@@ -41,106 +36,78 @@ class AlertmanagerPayload(BaseModel):
 def map_severity(severity: str) -> Severity:
     mapping = {
         "critical": Severity.p0,
-        "warning": Severity.p2,
-        "info": Severity.p3,
+        "warning": Severity.p1,
+        "info": Severity.p2,
     }
     return mapping.get(severity.lower(), Severity.p2)
 
 
 @router.post("/alertmanager")
 async def alertmanager_webhook(
-    request: Request,
     payload: AlertmanagerPayload,
-    pipeline: IncidentPipeline = Depends(get_pipeline)
+    request: Request,
+    pipeline: IncidentPipeline = Depends(get_pipeline),
 ):
-
-    logger.info(f"[WEBHOOK] Payload received: {payload.dict()}")
-
-    processed = []
+    created = []
 
     for alert in payload.alerts:
-
         if alert.status != "firing":
             continue
 
-        title = (
-            alert.annotations.summary
-            or alert.labels.alertname
-            or "Unknown Alert"
-        )
-
+        title = alert.annotations.summary or alert.labels.alertname or "Alert detected"
+        description = alert.annotations.description or title
         severity = map_severity(alert.labels.severity or "warning")
+        service = alert.labels.service or "platform"
+        alertname = alert.labels.alertname or "alert"
 
-        service = alert.labels.service or "unknown"
-
-        logger.info(
-            f"[WEBHOOK] Processing alert: "
-            f"title={title} severity={severity.value} service={service}"
-        )
-
-        incident = Incident(
-            title=title,
-            description=alert.annotations.description or title,
-            severity=severity,
-            component=service,
-            source="alertmanager",
-            root_cause="Pending investigation",
-            rca_category=RcaCategory.unknown,
-            rca_description="Auto-generated from Alertmanager webhook",
-            state=IncidentState.open,
-        )
-
+        # Step 1 — Run incident pipeline first to get incident_id
+        incident_id = None
         try:
-
+            incident = Incident(
+                title=title,
+                description=description,
+                source="alertmanager",
+                root_cause=f"Alert triggered: {alertname} on {service}. Automated detection via Prometheus alerting rules.",
+                rca_category=RcaCategory.dependency_failure,
+                rca_description=f"Automated incident from Alertmanager. Alert: {alertname}. Service: {service}. Engineer investigation required to determine full root cause and apply fix.",
+                severity=severity,
+                component=service,
+            )
             result = pipeline.process(incident)
 
-            if result.incident:
-
-                incident_payload = result.incident.model_dump(mode="json")
-
-                await request.app.state.nats.publish(
-                    "incidents.created",
-                    json.dumps(incident_payload).encode()
-                )
-
-                logger.info(
-                    f"[WEBHOOK] Published incident event to NATS: "
-                    f"{result.incident.id}"
-                )
-
-                processed.append({
+            if result.status == 201 and result.incident:
+                incident_id = str(result.incident.id)
+                logger.info(f"[WEBHOOK] Incident created: {incident_id}")
+                created.append({
+                    "incident_id": incident_id,
                     "title": title,
-                    "action": "created",
-                    "incident_id": str(result.incident.id),
+                    "severity": severity.value,
+                    "service": service,
+                    "action": "created"
                 })
-
             else:
-
-                logger.warning(
-                    f"[WEBHOOK] Incident creation failed: "
-                    f"{result.reason or result.errors}"
-                )
-
-                processed.append({
-                    "title": title,
-                    "action": result.reason or "failed",
-                })
+                logger.info(f"[WEBHOOK] Skipped: {result.reason}")
+                created.append({"title": title, "action": result.reason or "skipped"})
 
         except Exception as e:
+            logger.error(f"[WEBHOOK] Pipeline error: {e}")
+            created.append({"title": title, "action": "exception", "error": str(e)})
 
-            logger.exception(
-                f"[WEBHOOK] Pipeline failure while processing "
-                f"'{title}': {e}"
-            )
+        # Step 2 — Publish raw signal to NATS with incident_id for AI
+        try:
+            nats = request.app.state.nats
+            raw_signal = {
+                "event_type": "alert.firing",
+                "alertname": alertname,
+                "severity": alert.labels.severity,
+                "service": service,
+                "summary": alert.annotations.summary,
+                "description": description,
+                "incident_id": incident_id,
+            }
+            await nats.publish("signals.alerts", json.dumps(raw_signal).encode())
+            logger.info(f"[WEBHOOK] Published to NATS: {alertname}")
+        except Exception as e:
+            logger.warning(f"[WEBHOOK] NATS publish failed: {e}")
 
-            processed.append({
-                "title": title,
-                "action": "exception",
-                "error": str(e),
-            })
-
-    return {
-        "status": "received",
-        "processed": len(processed),
-        "details": processed,
-    }
+    return {"status": "received", "processed": len(created), "details": created}

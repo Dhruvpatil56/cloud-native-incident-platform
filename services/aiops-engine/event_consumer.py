@@ -1,6 +1,7 @@
 import asyncio
 import json
 import nats
+import httpx
 import traceback
 
 from analyzer import analyze_incident
@@ -16,12 +17,29 @@ async def start_consumer():
             try:
                 print(f"[AIOPS] Received message on {msg.subject}")
                 data = json.loads(msg.data.decode())
-                print(f"[AIOPS] Processing: {data}")
+                print(f"[AIOPS] Processing: {data.get('alertname', 'unknown')}")
+
                 analysis = await analyze_incident(data)
                 AIOPS_INCIDENTS_ANALYZED_TOTAL.inc()
+
                 print(f"\n===== AI INCIDENT ANALYSIS =====\n")
                 print(analysis)
                 print("\n================================\n")
+
+                # Store analysis back to incident if incident_id present
+                incident_id = data.get("incident_id")
+                if incident_id:
+                    try:
+                        async with httpx.AsyncClient() as client:
+                            await client.patch(
+                                f"http://incident-service:8000/api/v1/incidents/{incident_id}/ai-analysis",
+                                json={"analysis": analysis},
+                                timeout=10.0
+                            )
+                            print(f"[AIOPS] Analysis stored for incident {incident_id}")
+                    except Exception as e:
+                        print(f"[AIOPS] Failed to store analysis: {e}")
+
             except Exception as e:
                 AIOPS_ANALYSIS_FAILURES_TOTAL.inc()
                 print(f"[AIOPS] Handler error: {e}")

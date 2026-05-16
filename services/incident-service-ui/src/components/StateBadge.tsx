@@ -1,5 +1,9 @@
 import type { IncidentState } from "../types/incident";
-
 export function StateBadge({ state }: { state: IncidentState }) {
-  return <span className="badge state">{state}</span>;
+  if (!state) return null;
+  return (
+    <span className={`state-badge ${state.toLowerCase()}`}>
+      {state}
+    </span>
+  );
 }

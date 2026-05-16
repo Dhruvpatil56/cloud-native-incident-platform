@@ -49,6 +49,7 @@ class Incident(BaseModel):
     mttr_seconds: int | None = None
     hash: str = ""
     metadata: dict = Field(default_factory=dict)
+    ai_analysis: str | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
