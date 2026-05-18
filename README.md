@@ -14,52 +14,46 @@ A production-style DevOps/SRE platform designed for automated incident detection
 When deploying on a fresh AWS/EC2 instance, follow these steps in order to set up your environment, configuration, and networking:
 
 ### 1. Create the Environment File
-
 Always initialize your local configuration file from the template first:
-\`\`\`bash
+```bash
 cp .env.example .env
-\`\`\`
+```
 
 ### 2. Initialize Secrets & AI Config
-
 Run the initialization script to securely paste your Groq API key without exposing it to Git:
-\`\`\`bash
+```bash
 chmod +x init-env.sh
 ./init-env.sh
-\`\`\`
+```
 
 ### 3. Update Public Connectivity
-
 Map the frontend API URL to your current EC2 instance's Public IP:
-\`\`\`bash
+```bash
 chmod +x update_ip.sh
 ./update_ip.sh
-\`\`\`
+```
 
 ### 4. Launch the Stack
-
 Build and launch all services cleanly in detached mode:
-\`\`\`bash
+```bash
 docker compose up --build -d
-\`\`\`
+```
 
 ## Service Access (AWS Deployment)
 
-| Service         | Port | External URL Example        |
-| --------------- | ---- | --------------------------- |
-| **Frontend UI** | 5173 | http://<EC2_PUBLIC_IP>:5173 |
-| **API Gateway** | 8080 | http://<EC2_PUBLIC_IP>:8080 |
-| **Grafana**     | 3000 | http://<EC2_PUBLIC_IP>:3000 |
-| **Prometheus**  | 9090 | http://<EC2_PUBLIC_IP>:9090 |
+| Service           | Port   | External URL Example             |
+| ----------------- | ------ | -------------------------------- |
+| **Frontend UI** | 5173   | http://<EC2_PUBLIC_IP>:5173      |
+| **API Gateway** | 8080   | http://<EC2_PUBLIC_IP>:8080      |
+| **Grafana** | 3000   | http://<EC2_PUBLIC_IP>:3000      |
+| **Prometheus** | 9090   | http://<EC2_PUBLIC_IP>:9090      |
 
 ---
 
 ## SRE Features
-
 - **Blameless Postmortems**: Automated via the AIOps engine.
 - **Reliability Metrics**: Real-time tracking of MTTR, MTTD, and MTTA.
 - **Self-Healing**: Automated incident triage via NATS event bus.
 
 ## Related Projects
-
 - [Incident Management System](https://github.com/Dhruvpatil56/incident-management-system) - The core IMS engine.
