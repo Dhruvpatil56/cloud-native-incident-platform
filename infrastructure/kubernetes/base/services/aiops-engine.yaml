@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aiops-secrets
+  namespace: platform
+type: Opaque
+stringData:
+  GROQ_API_KEY: YOUR-API-KEY
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiops-engine
+  namespace: platform
+  labels:
+    app: aiops-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aiops-engine
+  template:
+    metadata:
+      labels:
+        app: aiops-engine
+    spec:
+      containers:
+        - name: aiops-engine
+          image: cloud-native-incident-platform-aiops-engine:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8005
+          env:
+            - name: GROQ_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aiops-secrets
+              key: groq-api-key
+                secretKeyRef:
+                  name: aiops-secrets
+                  key: GROQ_API_KEY
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aiops-engine
+  namespace: platform
+spec:
+  selector:
+    app: aiops-engine
+  ports:
+    - port: 8005
+      targetPort: 8005

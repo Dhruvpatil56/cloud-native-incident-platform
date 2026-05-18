@@ -34,7 +34,8 @@ spec:
     spec:
       containers:
         - name: incident-service
-          image: ECR_REGISTRY/cloud-native-platform/incident-service:latest
+          imagePullPolicy: Never
+          image: cloud-native-incident-platform-incident-service:latest
           ports:
             - containerPort: 8000
           envFrom:

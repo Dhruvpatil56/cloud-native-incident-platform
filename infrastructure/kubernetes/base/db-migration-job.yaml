@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration
+  namespace: platform
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:16-alpine
+          command: ['sh', '-c', 'until pg_isready -h postgres -U incident -d incidents; do echo waiting for postgres; sleep 2; done']
+      containers:
+        - name: migrate
+          image: postgres:16-alpine
+          env:
+            - name: PGPASSWORD
+              value: incident
+          command:
+            - psql
+            - -h
+            - postgres
+            - -U
+            - incident
+            - -d
+            - incidents
+            - -c
+            - |
+              CREATE TABLE IF NOT EXISTS incidents (
+                id UUID PRIMARY KEY,
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                source TEXT NOT NULL,
+                root_cause TEXT NOT NULL,
+                rca_category TEXT NOT NULL,
+                rca_description TEXT NOT NULL,
+                rca_verified_by TEXT,
+                state TEXT NOT NULL DEFAULT 'OPEN',
+                severity TEXT NOT NULL DEFAULT 'P2',
+                component TEXT NOT NULL DEFAULT 'unknown',
+                first_signal_at TIMESTAMPTZ,
+                rca_submitted_at TIMESTAMPTZ,
+                mttr_seconds INTEGER,
+                hash TEXT UNIQUE,
+                metadata JSONB DEFAULT '{}',
+                ai_analysis TEXT,
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                updated_at TIMESTAMPTZ DEFAULT NOW()
+              );

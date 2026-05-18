@@ -22,7 +22,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ECR_REGISTRY/cloud-native-platform/incident-service-ui:latest
+          imagePullPolicy: Never
+          image: cloud-native-incident-platform-incident-service-ui:latest
           ports:
             - containerPort: 5173
           resources:

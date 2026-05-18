@@ -31,7 +31,8 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: ECR_REGISTRY/cloud-native-platform/api-gateway:latest
+          imagePullPolicy: Never
+          image: cloud-native-incident-platform-api-gateway:latest
           ports:
             - containerPort: 8080
           envFrom:
