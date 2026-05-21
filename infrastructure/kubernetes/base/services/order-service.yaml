@@ -21,8 +21,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: cloud-native-incident-platform-order-service:latest
-          imagePullPolicy: Never
+          image: dhruvpatil56/cnip-order-service:latest
           ports:
             - containerPort: 8002
           env:

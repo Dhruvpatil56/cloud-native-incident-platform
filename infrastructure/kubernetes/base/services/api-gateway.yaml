@@ -31,8 +31,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          imagePullPolicy: Never
-          image: cloud-native-incident-platform-api-gateway:latest
+          image: dhruvpatil56/cnip-api-gateway:latest
           ports:
             - containerPort: 8080
           envFrom:

@@ -30,8 +30,7 @@ spec:
     spec:
       containers:
         - name: health-service
-          imagePullPolicy: Never
-          image: cloud-native-incident-platform-health-service:latest
+          image: dhruvpatil56/cnip-health-service:latest
           ports:
             - containerPort: 8001
           envFrom:

@@ -26,8 +26,7 @@ spec:
     spec:
       containers:
         - name: aiops-engine
-          image: cloud-native-incident-platform-aiops-engine:latest
-          imagePullPolicy: Never
+          image: dhruvpatil56/cnip-aiops-engine:latest
           ports:
             - containerPort: 8005
           env:

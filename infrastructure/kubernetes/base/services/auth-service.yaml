@@ -21,8 +21,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: cloud-native-incident-platform-auth-service:latest
-          imagePullPolicy: Never
+          image: dhruvpatil56/cnip-auth-service:latest
           ports:
             - containerPort: 8003
           env:
