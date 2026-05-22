@@ -5,7 +5,7 @@ metadata:
   namespace: platform
 type: Opaque
 stringData:
-  GROQ_API_KEY: YOUR-API-KEY
+  GROQ_API_KEY: "PASTE_KEY_HERE"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -31,10 +31,7 @@ spec:
             - containerPort: 8005
           env:
             - name: GROQ_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: aiops-secrets
-              key: groq-api-key
+              valueFrom:
                 secretKeyRef:
                   name: aiops-secrets
                   key: GROQ_API_KEY
