@@ -1,7 +1,9 @@
 import axios from "axios";
 import type { Incident, IncidentState, RcaSubmitPayload } from "../types/incident";
 
-const http = axios.create({ baseURL: import.meta.env.VITE_API_URL });
+const BASE_URL = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:8080`;
+
+const http = axios.create({ baseURL: BASE_URL });
 
 export async function fetchIncidents(): Promise<Incident[]> {
   const { data } = await http.get<Incident[]>("/api/v1/incidents");

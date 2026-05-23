@@ -1,0 +1,138 @@
+{
+  "title": "K8s Cluster Health",
+  "uid": "k8s-cluster-health",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "tags": ["kubernetes", "platform"],
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Total Pods Running",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [{ "color": "green", "value": null }] }
+        }
+      },
+      "targets": [{ "expr": "count(kube_pod_status_phase{phase='Running'})", "datasource": { "type": "prometheus" } }]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Pods Pending",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }] }
+        }
+      },
+      "targets": [{ "expr": "count(kube_pod_status_phase{phase='Pending'}) or vector(0)", "datasource": { "type": "prometheus" } }]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Pods Failed",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }
+        }
+      },
+      "targets": [{ "expr": "count(kube_pod_status_phase{phase='Failed'}) or vector(0)", "datasource": { "type": "prometheus" } }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Total Deployments",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [{ "color": "blue", "value": null }] }
+        }
+      },
+      "targets": [{ "expr": "count(kube_deployment_created)", "datasource": { "type": "prometheus" } }]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Unavailable Deployments",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }
+        }
+      },
+      "targets": [{ "expr": "count(kube_deployment_status_replicas_unavailable > 0) or vector(0)", "datasource": { "type": "prometheus" } }]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Total Namespaces",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [{ "color": "blue", "value": null }] }
+        }
+      },
+      "targets": [{ "expr": "count(kube_namespace_created)", "datasource": { "type": "prometheus" } }]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Pod Status Over Time",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "targets": [
+        { "expr": "count(kube_pod_status_phase{phase='Running'})", "legendFormat": "Running", "datasource": { "type": "prometheus" } },
+        { "expr": "count(kube_pod_status_phase{phase='Pending'}) or vector(0)", "legendFormat": "Pending", "datasource": { "type": "prometheus" } },
+        { "expr": "count(kube_pod_status_phase{phase='Failed'}) or vector(0)", "legendFormat": "Failed", "datasource": { "type": "prometheus" } }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Deployment Replicas",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "targets": [
+        { "expr": "sum by (deployment) (kube_deployment_status_replicas_available{namespace='platform'})", "legendFormat": "{{ deployment }} available", "datasource": { "type": "prometheus" } },
+        { "expr": "sum by (deployment) (kube_deployment_status_replicas_unavailable{namespace='platform'})", "legendFormat": "{{ deployment }} unavailable", "datasource": { "type": "prometheus" } }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "table",
+      "title": "Pod Status by Namespace",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "options": { "sortBy": [{ "displayName": "Namespace" }] },
+      "targets": [
+        { "expr": "count by (namespace, phase) (kube_pod_status_phase)", "legendFormat": "{{namespace}} - {{phase}}", "datasource": { "type": "prometheus" }, "instant": true }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Container Restarts",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "targets": [
+        { "expr": "sum by (pod) (kube_pod_container_status_restarts_total{namespace='platform'})", "legendFormat": "{{ pod }}", "datasource": { "type": "prometheus" } }
+      ]
+    }
+  ]
+}
