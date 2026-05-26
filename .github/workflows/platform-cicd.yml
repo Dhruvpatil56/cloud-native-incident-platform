@@ -143,3 +143,4 @@ jobs:
 
           echo "========== NATS LOGS =========="
           kubectl logs deployment/nats -n platform || true
+
