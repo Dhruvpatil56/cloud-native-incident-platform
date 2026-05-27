@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - main
-
   pull_request:
-
   workflow_dispatch:
 
 env:
@@ -17,7 +15,6 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         service:
@@ -43,14 +40,14 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}:${IMAGE_TAG} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/cnip-${{ matrix.service }}:${IMAGE_TAG} \
             ./services/${{ matrix.service }}
 
       - name: Push Docker image
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           docker push \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}:${IMAGE_TAG}
+            ${{ secrets.DOCKERHUB_USERNAME }}/cnip-${{ matrix.service }}:${IMAGE_TAG}
 
   smoke-test:
     runs-on: ubuntu-latest
@@ -75,60 +72,42 @@ jobs:
         run: |
           kubectl apply -f infrastructure/kubernetes/namespaces.yaml
 
-      - name: Deploy infrastructure
+      - name: Deploy databases
         run: |
           kubectl apply -f infrastructure/kubernetes/base/databases.yaml
-          kubectl apply -f infrastructure/kubernetes/base/observability/
+          kubectl wait --for=condition=ready pod \
+            -l app=postgres -n platform --timeout=180s
+          kubectl wait --for=condition=ready pod \
+            -l app=redis -n platform --timeout=180s
+          kubectl wait --for=condition=ready pod \
+            -l app=nats -n platform --timeout=180s
 
-      - name: Wait for infrastructure readiness
+      - name: Run DB migration
         run: |
-          kubectl wait --for=condition=ready pod \
-            -l app=postgres \
-            -n platform \
-            --timeout=180s
-
-          kubectl wait --for=condition=ready pod \
-            -l app=redis \
-            -n platform \
-            --timeout=180s
-
-          kubectl wait --for=condition=ready pod \
-            -l app=nats \
-            -n platform \
-            --timeout=180s
+          kubectl apply -f infrastructure/kubernetes/base/db-migration-job.yaml
+          kubectl wait --for=condition=complete job/db-migration \
+            -n platform --timeout=120s
 
       - name: Deploy platform services
         run: |
           kubectl apply -f infrastructure/kubernetes/base/services/incident-service.yaml
-          kubectl apply -f infrastructure/kubernetes/base/services/aiops-engine.yaml
           kubectl apply -f infrastructure/kubernetes/base/services/api-gateway.yaml
           kubectl apply -f infrastructure/kubernetes/base/services/health-service.yaml
-
-      - name: Wait for service readiness
-        run: |
           kubectl wait --for=condition=ready pod \
-            -l app=incident-service \
-            -n platform \
-            --timeout=180s
-
+            -l app=incident-service -n platform --timeout=180s
           kubectl wait --for=condition=ready pod \
-            -l app=aiops-engine \
-            -n platform \
-            --timeout=180s
+            -l app=api-gateway -n platform --timeout=120s
 
       - name: Port forward incident-service
         run: |
           kubectl port-forward svc/incident-service 8000:8000 -n platform &
-          sleep 15
-
-      - name: Cleanup previous incidents
-        run: |
-          bash scripts/cleanup-incidents.sh
+          sleep 10
 
       - name: Run smoke test
         env:
           WEBHOOK_URL: http://localhost:8000/webhook/alertmanager
           API_URL: http://localhost:8000/api/v1/incidents
+          WAIT_SECONDS: "5"
         run: |
           bash scripts/fire-incident.sh
 
@@ -137,10 +116,5 @@ jobs:
         run: |
           echo "========== INCIDENT SERVICE LOGS =========="
           kubectl logs deployment/incident-service -n platform || true
-
-          echo "========== AIOPS ENGINE LOGS =========="
-          kubectl logs deployment/aiops-engine -n platform || true
-
-          echo "========== NATS LOGS =========="
-          kubectl logs deployment/nats -n platform || true
-
+          echo "========== DB MIGRATION LOGS =========="
+          kubectl logs job/db-migration -n platform || true
