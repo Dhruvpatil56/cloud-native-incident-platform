@@ -1,16 +1,16 @@
 # Cloud Native AIOps & Incident Response Platform
 
-![Architecture](./Architecture.png)
+![Architecture](./assets/Architecture.png)
 
-![Incident-Dashboard](./Incident-Dashboard.png)
+![Incident-Dashboard](./assets/Incident-Dashboard.png)
 
-![AI-1](./AI-1.png)
+![AI-1](./assets/AI-1.png)
 
-![AI-2](./AI-2.png)
+![AI-2](./assets/AI-2.png)
 
-![RCA](./RCA.png)
+![RCA](./assets/RCA.png)
 
-![Grafana-Dashboard](./Grafana-Dashboard.png)
+![Grafana-Dashboard](./assets/Grafana-Dashboard.png)
 > A production-grade SRE platform that automatically detects failures, creates incidents, and generates AI-powered root cause analysis — running on Kubernetes.
 
 [![CI/CD](https://github.com/Dhruvpatil56/cloud-native-incident-platform/actions/workflows/platform-cicd.yml/badge.svg)](https://github.com/Dhruvpatil56/cloud-native-incident-platform/actions/workflows/platform-cicd.yml)
@@ -146,6 +146,7 @@ cloud-native-incident-platform/
 ## Related
 
 [Incident Management System](https://github.com/Dhruvpatil56/incident-management-system) — The core IMS engine this platform is built around. Standalone FastAPI service with token bucket rate limiting, Redis debouncing, ACID transactions, and state machine design pattern.
+
 
 
 
